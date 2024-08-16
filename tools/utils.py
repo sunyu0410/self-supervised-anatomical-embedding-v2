@@ -171,7 +171,7 @@ def read_image_regis(path):
 
 
 def visualize(im1, im2, norm_ratio_1, norm_ratio_2, pt1, pt2, score,
-              lung_window=False, save_folder='', savename=None, im1_isMRI=False, im2_isMRI=False):
+              lung_window=False, savename=None, im1_isMRI=False, im2_isMRI=False):
     print('visualizing ...')
     if lung_window:
         q_window_low, q_window_high = -1350, 150
@@ -183,7 +183,7 @@ def visualize(im1, im2, norm_ratio_1, norm_ratio_2, pt1, pt2, score,
         q_window_low, q_window_high = im1.min(), im1.max()
     if im2_isMRI:
         k_window_low, k_window_high = im2.min(), im2.max()
-    markersize = 26
+    markersize = 5
 
     fig, ax = plt.subplots(3, 2, figsize=(20, 30))
     q_img = im1.transpose(2, 0, 1)
@@ -247,10 +247,8 @@ def visualize(im1, im2, norm_ratio_1, norm_ratio_2, pt1, pt2, score,
                   markersize=markersize, markeredgewidth=2)
     plt.suptitle(f'score:{score}')
     plt.tight_layout()
-    if not savename is None:
-        os.makedirs(save_folder, exist_ok=True)
-        plt.savefig(os.path.join(save_folder,
-            f'{savename}_{pt1[0]}_{pt1[1]}_{pt1[2]}_{pt2[0]}_{pt2[1]}_{pt2[2]}.png'))
+    if savename is not None:
+        plt.savefig(f'{savename}_{pt1[0]}_{pt1[1]}_{pt1[2]}_{pt2[0]}_{pt2[1]}_{pt2[2]}.png')
         plt.close()
     else:
         plt.show()

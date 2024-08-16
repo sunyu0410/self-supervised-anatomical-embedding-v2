@@ -1,8 +1,22 @@
+# ssh ysun@vmpr-res-cluster1.unix.petermac.org.au
+# [ysun@vmpr-res-cluster1 tools]$ sinteractive -p gpu --mem 64G --gres=gpu:T4 --time=0-12:00
+# [ysun@papr-res-gpu02 tools]$ pwd
+# /physical_sciences/yusun/self-supervised-anatomical-embedding-v2/tools
+# [ysun@papr-res-gpu02 tools]$ cd ..
+# [ysun@papr-res-gpu02 self-supervised-anatomical-embedding-v2]$ source py38/bin/activate
+# (py38) [ysun@papr-res-gpu02 self-supervised-anatomical-embedding-v2]$ cd tools/
+# (py38) [ysun@papr-res-gpu02 tools]$ ipython demo.py 
+
 # Copyright (c) Medical AI Lab, Alibaba DAMO Academy
 import numpy as np
 import os
 import matplotlib.pyplot as plt
 import time
+import sys
+from pathlib import Path
+from monitor import FileMonitor
+
+sys.path.append('..')
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 from interfaces import init, get_embedding, get_sim_embed_loc, normalize
@@ -17,7 +31,6 @@ checkpoint_file = 'checkpoints/SAM.pth'
 im1_file = 'data/raw_data/NIH_lymph_node/ABD_LYMPH_001.nii.gz'
 im2_file = 'data/raw_data/NIH_lymph_node/ABD_LYMPH_002.nii.gz'
 
-
 def get_random_query_point(im):
     im1_shape = list(im['shape'][1:])
     num_try = 0
@@ -31,7 +44,8 @@ def get_random_query_point(im):
     return p
 
 
-def main():
+def find_corresp(pt1):
+    # breakpoint()
     time1 = time.time()
     model = init(config_file, checkpoint_file)
     time2 = time.time()
@@ -41,7 +55,7 @@ def main():
     time3 = time.time()
     print('image loading time:', time3 - time2)
 
-    pt1 = get_random_query_point(im1)
+    
 
     emb1 = get_embedding(normed_im1, model)
     emb2 = get_embedding(normed_im2, model)
@@ -56,8 +70,33 @@ def main():
     print(pt2, score)
     time5 = time.time()
     print('matching point computing time:', time5 - time4)
-    visualize(im1['img'], im2['img'], norm_info_1, norm_info_2, pt1, pt2, score)
+    # breakpoint()
+    # visualize(im1['img'], im2['img'], norm_info_1, norm_info_2, pt1, pt2, score, savename='test.png')
+    return pt2
+
 
 
 if __name__ == '__main__':
-    main()
+    im1, normed_im1, norm_info_1 = read_image(im1_file, is_MRI=False)
+    pt1 = get_random_query_point(im1)
+    pt1 = np.array([93, 139,  44])
+    pt2 = find_corresp(pt1)
+    
+    print(pt1)
+    print(pt2)
+
+    file1 = Path('tools/f-1.txt')
+    file2 = Path('tools/f-2.txt')
+    
+    def write_pt2_to_file2():
+        pt1 = eval(open(file1).read().strip())
+        pt2 = find_corresp(pt1).tolist()
+        print(f'Corresponding point: {pt2}')
+        output = dict(
+            pt1 = pt1,
+            pt2 = pt2
+        )
+        print(str(output), end='', file=open(file2, 'w'))
+    
+    monitor = FileMonitor(file1, write_pt2_to_file2)
+    monitor.start()

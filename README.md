@@ -1,3 +1,7 @@
+## Dev
+* Weights & Data: Peter Mac [OneDrive](https://petermacvic-my.sharepoint.com/:u:/g/personal/yu_sun_petermac_org/ERYaIReLZHJNhHXkaLSqRP4B7FR_FvXfvcTfUDgPMklO2w?e=YhXr95)
+* Slicer interactive example: `tools/demo`, `tools/demo-slicer-code.py`
+
 # SAM (Self-supervised Anatomical eMbedding) and UAE (Universal Anatomical Embedding)
 Please find our papers:
 1. Xiaoyu Bai, Fan Bai, Xiaofei Huo, Jia Ge, Jingjing Lu, Xianghua Ye, Ke Yan, Yong Xia, "UAE: Universal Anatomical 

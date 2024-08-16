@@ -11,3 +11,9 @@ __pycache__/
 *.pyc
 sam/datasets/piplines/__pycache__/*
 */demo_multiim_semantic_stable_points.py
+
+# project specific
+checkpoints/
+data/
+py38
+*.zip
