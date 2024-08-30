@@ -27,10 +27,6 @@ os.chdir(os.path.join(os.path.dirname(__file__), os.pardir))  # go to root dir o
 config_file = 'configs/sam/sam_NIHLN.py'
 checkpoint_file = 'checkpoints/SAM.pth'
 
-# assume all input image are in torchio "LPS+" direction which equal to "RAI" orientation in ITK-Snap.
-im1_file = 'data/raw_data/NIH_lymph_node/ABD_LYMPH_001.nii.gz'
-im2_file = 'data/raw_data/NIH_lymph_node/ABD_LYMPH_002.nii.gz'
-
 def get_random_query_point(im):
     im1_shape = list(im['shape'][1:])
     num_try = 0
@@ -44,7 +40,7 @@ def get_random_query_point(im):
     return p
 
 
-def find_corresp(pt1):
+def find_corresp(pt1, im1_file, im2_file):
     # breakpoint()
     time1 = time.time()
     model = init(config_file, checkpoint_file)
@@ -54,8 +50,6 @@ def find_corresp(pt1):
     im2, normed_im2, norm_info_2 = read_image(im2_file, is_MRI=False)
     time3 = time.time()
     print('image loading time:', time3 - time2)
-
-    
 
     emb1 = get_embedding(normed_im1, model)
     emb2 = get_embedding(normed_im2, model)
@@ -75,12 +69,15 @@ def find_corresp(pt1):
     return pt2
 
 
-
 if __name__ == '__main__':
+    # assume all input image are in torchio "LPS+" direction which equal to "RAI" orientation in ITK-Snap.
+    im1_file = 'data/raw_data/NIH_lymph_node/ABD_LYMPH_001.nii.gz'
+    im2_file = 'data/raw_data/NIH_lymph_node/ABD_LYMPH_002.nii.gz'
+
     im1, normed_im1, norm_info_1 = read_image(im1_file, is_MRI=False)
     pt1 = get_random_query_point(im1)
     pt1 = np.array([93, 139,  44])
-    pt2 = find_corresp(pt1)
+    pt2 = find_corresp(pt1, im1_file, im2_file)
     
     print(pt1)
     print(pt2)
