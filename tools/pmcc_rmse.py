@@ -132,6 +132,7 @@ def transfer_files(file_info, out_dir):
             file=open(out_dir/'src.txt', 'a')
         )
 
+
 if __name__ == "__main__":
     data_dir = Path(r'\\petermac.org.au\shared\ImageStore\Reirradiation\Lung')
     save_dir = Path(r'P:\yusun\self-supervised-anatomical-embedding-v2\data\lung')
