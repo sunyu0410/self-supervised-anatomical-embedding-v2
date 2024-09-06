@@ -60,8 +60,8 @@ for folder in data_dir.iterdir():
     print(pt2_gt, file=open(each_save_dir/'pt2_gt.txt', 'w'))
     
     # Calculate RMSD
-    pt2_gt_ijk = [i[-1] for i in pt2_gt]
-    rmsd = cal_rmsd(pt2, pt2_gt_ijk)
+    pt2_gt_lps = [i[-1] for i in pt2_gt]
+    rmsd = cal_rmsd(pt2, pt2_gt_lps)
     print(rmsd, file=open(each_save_dir/'rmsd.txt', 'w'))
     print(rmsd[0])
     
