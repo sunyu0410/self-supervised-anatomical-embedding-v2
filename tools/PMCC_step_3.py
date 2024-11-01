@@ -74,4 +74,21 @@ if __name__ == "__main__":
 
         print(folder, 'completed')
 
-        break
+        # break
+
+
+# # Multipage tiff (only grey level allowed, can't do RGB)
+# import skimage.io
+# import numpy as np
+# from pathlib import Path
+# import tifffile
+
+# fl = [i.as_posix() for i in list(Path('.').iterdir())]
+# fl.sort(key=lambda x: int(x.split('.')[0].split('-')[-1]))
+
+# imgs = [skimage.io.imread(i) for i in fl]
+# imgs_mean = [i.mean(-1).astype(np.uint8) for i in imgs]
+# im = np.stack(imgs_mean, -1)
+# im = im.swapaxes(0, -1)
+# im = im.swapaxes(1, 2) # shape: (18, 600, 1500)
+# tifffile.imwrite('test.tiff', im)

@@ -1,1 +1,1 @@
-from demo_semantic_stable_points import fixed_point_iterations
+# from demo_semantic_stable_points import fixed_point_iterations
