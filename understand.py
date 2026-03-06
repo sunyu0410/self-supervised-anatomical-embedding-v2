@@ -1,14 +1,3 @@
-from sam.apis.train import train_detector
-from mmdet.datasets import build_dataset
-from mmdet.models import build_detector
-from mmcv import Config
-from sam import *
-
-cfg = Config.fromfile('configs/sam/sam_NIHLN.py')
-cfg.model
-
-model = build_detector(cfg.model)
-
 # Download weights and data
 # git clone https://github.com/alibaba-damo-academy/self-supervised-anatomical-embedding-v2.git prj
 # pip install gdown && \
@@ -16,45 +5,79 @@ model = build_detector(cfg.model)
 #     unzip weights.zip && \
 #     mv Self-supervised_Anatomical_Embeddings/checkpoints . && \
 #     mv Self-supervised_Anatomical_Embeddings/data . && \
-#     rm -r Self-supervised_Anatomical_Embeddings weights.zip 
+#     rm -r Self-supervised_Anatomical_Embeddings weights.zip
 
 # Prepare the data
 # ipython misc/lymphnode_preprocess_crop_multi_process.py
 
-ds = build_dataset(cfg.data.train)
-
+from sam.apis.train import train_detector
+from mmdet.datasets import build_dataset
+from mmdet.models import build_detector
+from mmcv import Config
+from sam import *
+from torch.utils.data import DataLoader
 
 import torch
 from mmcv.parallel import DataContainer
 
-# 1. Get two samples from the dataset
-data1 = ds[0][0]
-data2 = ds[0][1]
+cfg = Config.fromfile("configs/sam/sam_NIHLN.py")
+cfg.model
+
+model = build_detector(cfg.model)
+ds = build_dataset(cfg.data.train)
+
 
 def unbox(dc):
     """Extracts the tensor or list from an MMCV DataContainer."""
     return dc.data if isinstance(dc, DataContainer) else dc
 
-# 2. Manually Batch (Stack) the tensors
-# We combine sample 1 and sample 2 into a batch of size 2
-batch_img = torch.stack([unbox(data1['img']), unbox(data2['img'])])
-batch_meshgrid = torch.stack([unbox(data1['meshgrid']), unbox(data2['meshgrid'])])
-batch_valid = torch.stack([unbox(data1['valid']), unbox(data2['valid'])])
 
-# 3. Handle img_metas (It must be a list of dicts)
-# unbox(data1['img_metas']) usually returns a single dict
-batch_metas = [unbox(data1['img_metas']), unbox(data2['img_metas'])]
+def collate(batch):
+    # Two views corresponds to the odd/even channel
+    # sam.py line 146
+    # view_1_fine = fine_feat[0, :, :, :, :].view(128, -1)
+    # view_2_fine = fine_feat[1, :, :, :, :].view(128, -1)
 
-# 4. Run the model
+    batch_img = []
+    batch_meshgrid = []
+    batch_metas = []
+    batch_valid = []
+
+    for data in batch:
+        # 1. Get two samples from the dataset
+        data1 = data[0]  # view 1
+        data2 = data[1]  # view 2
+
+        # 2. Manually Batch (Stack) the tensors
+        # We combine sample 1 and sample 2 into a batch of size 2
+        batch_img += [unbox(data1["img"]), unbox(data2["img"])]
+        batch_meshgrid += [unbox(data1["meshgrid"]), unbox(data2["meshgrid"])]
+        batch_valid += [unbox(data1["valid"]), unbox(data2["valid"])]
+
+        # 3. Handle img_metas (It must be a list of dicts)
+        # unbox(data1['img_metas']) usually returns a single dict
+        batch_metas += [unbox(data1["img_metas"]), unbox(data2["img_metas"])]
+
+    return (
+        torch.stack(batch_img),
+        torch.stack(batch_meshgrid),
+        torch.stack(batch_valid),
+        batch_metas,
+    )
+
+
+dl = DataLoader(ds, batch_size=1, collate_fn=collate)
+
 model = model.train().float()
-losses = model.forward_train(
-    img=batch_img,
-    img_metas=batch_metas,
-    meshgrid=batch_meshgrid,
-    valid=batch_valid
-)
 
-print(losses)
+
+# CodeSpace's memory only support one batch's calculation
+for img, meshgrid, valid, meta in dl:
+    losses = model.forward_train(
+        img=img, img_metas=meta, meshgrid=meshgrid, valid=valid
+    )
+    print(losses)
+    break
 
 # About the MMCV dataset and dataloader
 # from mmdet.datasets.pipelines import Compose
@@ -77,4 +100,3 @@ print(losses)
 # l[0][0]['img'].data[0].shape # torch.Size([10, 1, 32, 96, 96])
 
 # model(img=l[0][0]['img'].data[0], img_metas=l[0][0]['img_metas'], meshgrid=l[0][0]['meshgrid'].data[0], valid=l[0][0]['valid'].data[0]) # Out[79]: {'loss': tensor(11.3252, grad_fn=<AddBackward0>)}
-
