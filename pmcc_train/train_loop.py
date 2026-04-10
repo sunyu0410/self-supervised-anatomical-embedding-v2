@@ -4,11 +4,11 @@ import torch.optim as optim
 from model import model
 from data import ds, dl
 
-epochs = 10
+epochs = 50
 model = model.train().float()
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-for epoch in range(epochs):
+for epoch in range(10, epochs):
     for img, meshgrid, valid, metas in dl:
 
         optimizer.zero_grad()
@@ -32,3 +32,7 @@ for epoch in range(epochs):
         optimizer.step()
 
         print(total_loss)
+
+    if epoch % 10 == 0:
+        torch.save(model.state_dict(), f'pmcc_train/checkpoints/sam-v1-ft-epoch-{epoch}.pth')
+
