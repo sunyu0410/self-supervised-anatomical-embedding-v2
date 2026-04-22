@@ -4,11 +4,14 @@ import torch.optim as optim
 from model import model
 from data import ds, dl
 
-epochs = 50
-model = model.train().float()
-optimizer = optim.Adam(model.parameters(), lr=1e-3)
+from tqdm import tqdm
 
-for epoch in range(10, epochs):
+epochs = 501
+model = model.train().float()
+optimizer = optim.Adam(model.parameters(), lr=1e-4)
+
+pbar = tqdm(range(epochs))
+for epoch in pbar:
     for img, meshgrid, valid, metas in dl:
 
         optimizer.zero_grad()
@@ -31,8 +34,8 @@ for epoch in range(10, epochs):
         total_loss.backward()
         optimizer.step()
 
-        print(total_loss)
+        pbar.set_postfix_str(f'Loss: {total_loss.item()}')
 
-    if epoch % 10 == 0:
+    if epoch % 25 == 0:
         torch.save(model.state_dict(), f'pmcc_train/checkpoints/sam-v1-ft-epoch-{epoch}.pth')
 

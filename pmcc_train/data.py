@@ -3,6 +3,10 @@ from torch.utils.data import DataLoader
 from mmcv.parallel.data_container import DataContainer
 import torch
 
+
+# 5 ID, 10 images used for fine-tuning
+# PMCC_ReIrrad_L03  PMCC_ReIrrad_L06  PMCC_ReIrrad_L24  PMCC_ReIrrad_L25  PMCC_ReIrrad_L27
+
 ds = Dataset3dsam(
     data_dir="data",  # Data folder
     index_file="data/filelist.txt",  # File list (note that don't include extra empty lines)
