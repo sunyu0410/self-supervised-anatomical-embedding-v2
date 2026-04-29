@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 epochs = 501
 model = model.train().float()
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
+optimizer = optim.Adam(model.parameters(), lr=1e-5)
 
 pbar = tqdm(range(epochs))
 for epoch in pbar:
@@ -37,5 +37,5 @@ for epoch in pbar:
         pbar.set_postfix_str(f'Loss: {total_loss.item()}')
 
     if epoch % 25 == 0:
-        torch.save(model.state_dict(), f'pmcc_train/checkpoints/sam-v1-ft-epoch-{epoch}.pth')
+        torch.save(model.state_dict(), f'pmcc_train/checkpoints_lr1e-5/sam-v1-ft-epoch-{epoch}.pth')
 

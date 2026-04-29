@@ -8,8 +8,8 @@ import torch
 # PMCC_ReIrrad_L03  PMCC_ReIrrad_L06  PMCC_ReIrrad_L24  PMCC_ReIrrad_L25  PMCC_ReIrrad_L27
 
 ds = Dataset3dsam(
-    data_dir="data",  # Data folder
-    index_file="data/filelist.txt",  # File list (note that don't include extra empty lines)
+    data_dir="data/finetune",  # Data folder
+    index_file="data/finetune/filelist.txt",  # File list (note that don't include extra empty lines)
     pipeline=[
         {"type": "LoadTioImage"},
         {"type": "CropBackground"},
