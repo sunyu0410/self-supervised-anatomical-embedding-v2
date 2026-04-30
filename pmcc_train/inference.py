@@ -56,19 +56,17 @@ ft_ids = ['PMCC_ReIrrad_L03',  'PMCC_ReIrrad_L06',  'PMCC_ReIrrad_L24',  'PMCC_R
 data_dir = Path('data')
 
 
-for e in range(0, 501, 50):
+for e in range(0, 51, 5):
 
-    checkpoint_file = f"pmcc_train/checkpoints/sam-v1-ft-epoch-{e}.pth"
+    checkpoint_file = f"pmcc_train/checkpoints_lr1e-6/sam-v1-ft-epoch-{e}.pth"
     model = init(config_file, checkpoint_file)
-
-    dfs = []
 
     for f in data_dir.iterdir():
 
         if not f.name.startswith('PMCC'): continue
         if f.name in ft_ids: continue
 
-        outfile = Path(f'pmcc_train/after_ft/result_epoch_{e}_{f.name}.pkl')
+        outfile = Path(f'pmcc_train/after_ft_lr1e-6/result_epoch_{e}_{f.name}.pkl')
         if outfile.exists(): continue
 
         print(f)
@@ -108,8 +106,5 @@ for e in range(0, 501, 50):
             )
         )
 
-        dfs.append(df)
-
         df.to_pickle(outfile)
 
-    # pd.concat(dfs).to_csv(f'pmcc_train/after_ft/result_epoch_{e}.csv', index=False)
