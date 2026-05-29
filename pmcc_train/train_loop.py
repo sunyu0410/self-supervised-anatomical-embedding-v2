@@ -10,8 +10,8 @@ from data import ds, dl
 from tqdm import tqdm
 from mmcv.runner import load_checkpoint
 
-epochs = 50
-checkpoint = load_checkpoint(model, 'pmcc_train/checkpoints_lr1e-5/sam-v1-ft-epoch-50.pth', map_location="cpu")
+epochs = 15
+checkpoint = load_checkpoint(model, 'pmcc_train/checkpoints_lr1e-6/sam-v1-ft-epoch-10.pth', map_location="cpu")
 model = model.train().float()
 optimizer = optim.Adam(model.parameters(), lr=1e-6)
 
@@ -41,6 +41,6 @@ for epoch in pbar:
 
         pbar.set_postfix_str(f'Loss: {total_loss.item()}')
 
-    if epoch % 5 == 0:
-        torch.save(model.state_dict(), f'pmcc_train/checkpoints_lr1e-6/sam-v1-ft-epoch-{epoch}.pth')
+    if epoch % 1 == 0:
+        torch.save(model.state_dict(), f'pmcc_train/checkpoints_lr1e-7/sam-v1-ft-epoch-{epoch}.pth')
 
